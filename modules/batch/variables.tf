@@ -30,7 +30,7 @@ variable "mlflow_url" {
   type = string
 }
 
-# NEW: control whether job queues are ENABLED or DISABLED
+# Controls queue state AND whether queues attach to CEs
 variable "job_queue_state" {
   type    = string
   default = "ENABLED"

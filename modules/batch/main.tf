@@ -1,4 +1,6 @@
-# ---------------- Compute Environments ----------------
+############################
+# Compute Environments
+############################
 
 resource "aws_batch_compute_environment" "train" {
   name = "${var.name}-train-ce"
@@ -36,17 +38,25 @@ resource "aws_batch_compute_environment" "eval" {
   service_role = var.batch_service_role
 }
 
-# ---------------- Job Queues (use new state toggle) ----------------
+############################
+# Job Queues
+############################
+# When job_queue_state = "DISABLED", we intentionally ATTACH ZERO CEs
+# so CEs can be deleted/replaced without "found existing JobQueue relationship".
 
 resource "aws_batch_job_queue" "train" {
   name     = "${var.name}-train-queue"
   state    = var.job_queue_state
   priority = 10
 
-  # Highest priority CE first
-  compute_environment_order {
-    order               = 1
-    compute_environment = aws_batch_compute_environment.train.arn
+  dynamic "compute_environment_order" {
+    for_each = var.job_queue_state == "ENABLED" ? [
+      { order = 1, ce = aws_batch_compute_environment.train.arn }
+    ] : []
+    content {
+      order               = compute_environment_order.value.order
+      compute_environment = compute_environment_order.value.ce
+    }
   }
 }
 
@@ -55,13 +65,20 @@ resource "aws_batch_job_queue" "eval" {
   state    = var.job_queue_state
   priority = 10
 
-  compute_environment_order {
-    order               = 1
-    compute_environment = aws_batch_compute_environment.eval.arn
+  dynamic "compute_environment_order" {
+    for_each = var.job_queue_state == "ENABLED" ? [
+      { order = 1, ce = aws_batch_compute_environment.eval.arn }
+    ] : []
+    content {
+      order               = compute_environment_order.value.order
+      compute_environment = compute_environment_order.value.ce
+    }
   }
 }
 
-# ---------------- Job Definition ----------------
+############################
+# Job Definition
+############################
 
 resource "aws_batch_job_definition" "mlproj" {
   name                  = "${var.name}-jobdef"
