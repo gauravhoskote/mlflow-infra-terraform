@@ -13,3 +13,12 @@ variable "db_instance_class" {  default = "db.t3.medium" }
 variable "db_name"           {  default = "mlflow" }
 variable "rds_multi_az"      {    default = false }
 
+# NEW: control Batch job queue state (ENABLED for normal use; DISABLED to detach before CE replacement/deletion)
+variable "job_queue_state" {
+  type    = string
+  default = "ENABLED"
+  validation {
+    condition     = contains(["ENABLED", "DISABLED"], var.job_queue_state)
+    error_message = "job_queue_state must be either ENABLED or DISABLED."
+  }
+}

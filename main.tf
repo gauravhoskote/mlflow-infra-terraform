@@ -77,5 +77,8 @@ module "batch" {
   ecs_instance_profile = module.iam.ecs_instance_profile_arn
   batch_service_role   = module.iam.batch_service_role_arn
   ecr_image            = module.ecr.repo_url
-  mlflow_url           = "http://${module.alb.alb_dns}" # or https if you later add ACM
+  mlflow_url           = "http://${module.alb.alb_dns}"
+
+  # NEW: wire through the queue state toggle
+  job_queue_state      = var.job_queue_state
 }
