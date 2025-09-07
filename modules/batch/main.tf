@@ -16,6 +16,9 @@ resource "aws_batch_compute_environment" "train" {
     security_group_ids = [var.sg_id]
     instance_role      = var.ecs_instance_profile
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
   service_role = var.batch_service_role
 }
@@ -33,6 +36,9 @@ resource "aws_batch_compute_environment" "eval" {
     subnets            = var.private_subnet_ids
     security_group_ids = [var.sg_id]
     instance_role      = var.ecs_instance_profile
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 
   service_role = var.batch_service_role
