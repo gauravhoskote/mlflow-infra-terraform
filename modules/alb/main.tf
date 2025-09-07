@@ -1,4 +1,3 @@
-
 resource "aws_lb" "this" {
   name               = "${var.name}-alb"
   load_balancer_type = "application"
@@ -18,12 +17,11 @@ resource "aws_lb_target_group" "tg" {
   }
 }
 
-resource "aws_lb_listener" "https" {
+# HTTP listener on :80 (no certificate needed)
+resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.acm_arn
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
     type             = "forward"

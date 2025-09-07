@@ -13,4 +13,3 @@ variable "db_instance_class" {  default = "db.t3.medium" }
 variable "db_name"           {  default = "mlflow" }
 variable "rds_multi_az"      {    default = false }
 
-variable "acm_certificate_arn" { type = string }

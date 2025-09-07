@@ -68,9 +68,10 @@ resource "aws_security_group" "alb" {
   name   = "${var.name}-alb-sg"
   vpc_id = aws_vpc.this.id
 
+  # Open HTTP (port 80) to the world
   ingress {
-    from_port   = 443
-    to_port     = 443
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -82,6 +83,7 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 
 resource "aws_security_group" "ecs" {
   name   = "${var.name}-ecs-sg"
