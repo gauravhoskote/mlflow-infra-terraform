@@ -1,9 +1,9 @@
 resource "aws_batch_compute_environment" "train" {
-  compute_environment_name = "${var.name}-train-ce"
+  name = "${var.name}-train-ce"
   type = "MANAGED"
   compute_resources {
     type = "EC2"
-    instance_types = ["g5.xlarge","p3.2xlarge"]
+    instance_type = ["g5.xlarge","p3.2xlarge"]
     min_vcpus = 0
     max_vcpus = 256
     desired_vcpus = 0
@@ -15,11 +15,11 @@ resource "aws_batch_compute_environment" "train" {
 }
 
 resource "aws_batch_compute_environment" "eval" {
-  compute_environment_name = "${var.name}-eval-ce"
+  name = "${var.name}-eval-ce"
   type = "MANAGED"
   compute_resources {
     type = "EC2"
-    instance_types = ["c6i.large","c6i.xlarge"]
+    instance_type = ["c6i.large","c6i.xlarge"]
     min_vcpus = 0
     max_vcpus = 256
     desired_vcpus = 0
@@ -30,8 +30,8 @@ resource "aws_batch_compute_environment" "eval" {
   service_role = var.batch_service_role
 }
 
-resource "aws_batch_job_queue" "train" { name = "${var.name}-train-queue" priority = 10 compute_environments = [aws_batch_compute_environment.train.arn] }
-resource "aws_batch_job_queue" "eval"  { name = "${var.name}-eval-queue"  priority = 10 compute_environments = [aws_batch_compute_environment.eval.arn] }
+resource "aws_batch_job_queue" "train" { name = "${var.name}-train-queue" state = "ENABLED"  priority = 10 compute_environments = [aws_batch_compute_environment.train.arn] }
+resource "aws_batch_job_queue" "eval"  { name = "${var.name}-eval-queue" state = "ENABLED" priority = 10 compute_environments = [aws_batch_compute_environment.eval.arn] }
 
 resource "aws_batch_job_definition" "mlproj" {
   name = "${var.name}-jobdef"
