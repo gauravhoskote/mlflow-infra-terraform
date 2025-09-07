@@ -1,6 +1,10 @@
-
 locals {
   name = "${var.project}-${var.env}"
+}
+
+# Unique suffix to avoid global S3 name collisions / region redirects
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
 }
 
 module "vpc" {
@@ -13,7 +17,7 @@ module "vpc" {
 
 module "s3_artifacts" {
   source      = "./modules/s3_artifacts"
-  bucket_name = "${local.name}-artifacts"
+  bucket_name = "${local.name}-artifacts-${random_id.bucket_suffix.hex}"
 }
 
 module "iam" {
@@ -45,9 +49,7 @@ module "alb" {
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   sg_id             = module.vpc.alb_sg_id
-  # (HTTPS removed)  no acm_arn here
 }
-
 
 module "ecs_mlflow" {
   source               = "./modules/ecs_mlflow"
@@ -75,5 +77,5 @@ module "batch" {
   ecs_instance_profile = module.iam.ecs_instance_profile_arn
   batch_service_role   = module.iam.batch_service_role_arn
   ecr_image            = module.ecr.repo_url
-  mlflow_url           = "https://${module.alb.alb_dns}"
+  mlflow_url           = "http://${module.alb.alb_dns}" # or https if you later add ACM
 }

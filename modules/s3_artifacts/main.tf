@@ -1,7 +1,10 @@
+variable "bucket_name" {
+  type = string
+}
 
 resource "aws_s3_bucket" "mlflow" {
   bucket        = var.bucket_name
-  force_destroy = false
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "v" {
@@ -21,5 +24,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "sse" {
   }
 }
 
-output "bucket_name" { value = aws_s3_bucket.mlflow.id }
-output "bucket_arn"  { value = aws_s3_bucket.mlflow.arn }
+output "bucket_name" {
+  value = aws_s3_bucket.mlflow.id
+}
+
+output "bucket_arn" {
+  value = aws_s3_bucket.mlflow.arn
+}
