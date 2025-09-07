@@ -30,8 +30,29 @@ resource "aws_batch_compute_environment" "eval" {
   service_role = var.batch_service_role
 }
 
-resource "aws_batch_job_queue" "train" { name = "${var.name}-train-queue" state = "ENABLED"  priority = 10 compute_environments = [aws_batch_compute_environment.train.arn] }
-resource "aws_batch_job_queue" "eval"  { name = "${var.name}-eval-queue" state = "ENABLED" priority = 10 compute_environments = [aws_batch_compute_environment.eval.arn] }
+resource "aws_batch_job_queue" "train" {
+  name     = "${var.name}-train-queue"
+  state    = "ENABLED"
+  priority = 10
+
+  # Highest priority CE first
+  compute_environment_order {
+    order               = 1
+    compute_environment = aws_batch_compute_environment.train.arn
+  }
+}
+
+resource "aws_batch_job_queue" "eval" {
+  name     = "${var.name}-eval-queue"
+  state    = "ENABLED"
+  priority = 10
+
+  compute_environment_order {
+    order               = 1
+    compute_environment = aws_batch_compute_environment.eval.arn
+  }
+}
+
 
 resource "aws_batch_job_definition" "mlproj" {
   name = "${var.name}-jobdef"
